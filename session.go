@@ -290,11 +290,11 @@ func (s *Session) MakeRow(input *os.File) (func() error, error) {
 
 // SetEnvs 为session设置环境变量，遍历 envs 并发送 env 请求；是否起作用取决于服务器的实现。
 // 返回最后一个发生的错误；
-func (s *Session) SetEnvs(session *ssh.Session, envs *map[string]string) error {
+func (s *Session) SetEnvs(envs *map[string]string) error {
 	if envs != nil {
 		var err error = nil
 		for k, v := range *envs {
-			e := session.Setenv(k, v)
+			e := s.sess.Setenv(k, v)
 			if e != nil {
 				err = e
 			}

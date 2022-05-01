@@ -40,7 +40,7 @@ var (
 	knownHostsFlag        = kingpin.Flag("known-hosts", "use specified known hosts file.").Default(knownHostsPath()).String()
 	timeoutFlag           = kingpin.Flag("timeout", "timeout for connection.").Short('t').Default("0s").Duration()
 	termFlag              = kingpin.Flag("term", "use the given terminal-color mod to run the interactive command line or shell.").Short('z').Default(defaultTerm).String()
-	keepAliveFlag         = kingpin.Flag("keep-alive", "set the interval of keepalive request.").Short('l').Default("true").Bool()
+	keepAliveFlag         = kingpin.Flag("keep-alive", "send useless request to keep tcp connection alive.").Short('l').Default("true").Bool()
 	keepAliveIntervalFlag = kingpin.Flag("keep-alive-interval", "set the interval of keepalive request.").Short('i').Default("60s").Duration()
 
 	ignoreKnownHostsFlag = kingpin.Flag("ignore-host-key", "do not check the server's host key.").Default("false").Bool()
@@ -139,6 +139,10 @@ func initConfig() (*gossh.Config, error) {
 		config.BannerCallback = gossh.DisplayBanner
 	}
 
+	if randFlag != nil {
+		config.Rand = *randFlag
+	}
+
 	if forcePasswdFlag != nil && *forcePasswdFlag {
 		method, err := gossh.ReadPasswordAuth(fmt.Sprintf("password for %s@%s:", *userFlag, *hostFlag))
 		if err != nil {
@@ -174,19 +178,23 @@ func runShell() {
 
 	session, err := client.OpenSession()
 	if err != nil {
-		fmt.Printf("open session failed: %s\r\n", err)
+		fmt.Printf("Open session failed: %s\r\n", err)
 		return
 	}
 
 	err = session.PreparePty(*termFlag)
 	if err != nil {
-		fmt.Printf("request pty failed: %s\r\n", err)
+		fmt.Printf("Request pty failed: %s\r\n", err)
 		return
 	}
 
 	if *keepAliveFlag {
 		cancelKeepAlive := session.KeepAlive(*keepAliveIntervalFlag, 0)
 		defer cancelKeepAlive()
+	}
+
+	if envsFlag != nil {
+		session.SetEnvs(envsFlag)
 	}
 
 	var cancelUpdateWin context.CancelFunc = nil
@@ -214,15 +222,14 @@ func runShell() {
 
 	err = session.Shell()
 	if err != nil {
-		fmt.Printf("exit with error: %s\r\n", err)
+		fmt.Printf("Exit with error: %s\r\n", err)
 	}
-	fmt.Printf("exit status %d\r\n", 0)
+	fmt.Printf("Exit status %d\r\n", 0)
 }
 
 // runExec 远程命令执行模块的实现
 func runExec() {
 	config, err := initConfig()
-
 	client, err := gossh.Connect(net.JoinHostPort(*hostFlag, *portFlag), config)
 	if err != nil {
 		fmt.Printf("An error occurred: %s\r\n", err)
@@ -231,14 +238,18 @@ func runExec() {
 
 	session, err := client.OpenSession()
 	if err != nil {
-		fmt.Printf("open session failed: %s\r\n", err)
+		fmt.Printf("Open session failed: %s\r\n", err)
 		return
+	}
+
+	if envsFlag != nil {
+		session.SetEnvs(envsFlag)
 	}
 
 	if *ptyFlag {
 		err = session.PreparePty(*termFlag)
 		if err != nil {
-			fmt.Printf("request pty failed: %s\r\n", err)
+			fmt.Printf("Request pty failed: %s\r\n", err)
 			return
 		}
 		if runtime.GOOS == "windows" {
@@ -271,9 +282,9 @@ func runExec() {
 	}
 	err = session.Exec(*commandArg)
 	if err != nil {
-		fmt.Printf("exit with error: %s\r\n", err)
+		fmt.Printf("Exit with error: %s\r\n", err)
 	}
-	fmt.Printf("exit status %d\r\n", 0)
+	fmt.Printf("Exit status %d\r\n", 0)
 }
 
 // runVersion 打印版本信息

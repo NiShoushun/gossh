@@ -185,7 +185,7 @@ Flags:
                                  use specified known hosts file.
   -t, --timeout=0s               timeout for connection.
   -z, --term="xterm-256color"    use the given terminal-color mod to run the interactive command line or shell.
-  -l, --keep-alive               set the interval of keepalive request.
+  -l, --keep-alive               send useless request to keep tcp connection alive.
   -i, --keep-alive-interval=60s  set the interval of keepalive request.
       --ignore-host-key          do not check the server's host key.
       --cipher=CIPHER ...        choose cipher algorithm
