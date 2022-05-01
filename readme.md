@@ -148,8 +148,6 @@ func main() {
 
 ![image-20220327032755721](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202205012037229.png)
 
-
-
 ##### 编译 & 运行
 
 `cli` 包下包含了一个 `Run` 方函数，用于执行一个很简单的 SSH 客户端 demo，只需要导入包，编译后就可运行：
@@ -207,7 +205,6 @@ Commands:
 
   version
     show the version.
-
 ```
 
 ##### 创建ssh终端
