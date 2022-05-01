@@ -230,7 +230,7 @@ Commands:
 
 ##### 身份验证
 
-* `--P`：适用密码验证
+* `-P`：使用密码验证
 * `-a, --ssh-agent`：使用ssh-agent验证
 * `-k, --private-key`：私钥文件路径（默认为 `～/.ssh/id_rsa`）
 * `--known-hosts`：known_hosts 文件路径（默认为 `～/.ssh/known_hosts `）
