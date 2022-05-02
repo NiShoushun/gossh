@@ -1,7 +1,6 @@
 package gossh
 
 import (
-	"context"
 	"errors"
 	"golang.org/x/crypto/ssh"
 	"io"
@@ -72,33 +71,29 @@ func (client *SSHClient) OpenChannel(name string, extraData []byte) (Channel, <-
 	return client.Conn.OpenChannel(name, extraData)
 }
 
+// NewDirector 创建一个 Director
+func (client *SSHClient) NewDirector() *Director {
+	return &Director{
+		client: client,
+	}
+}
+
 // Dial 发送 direct-tcpip 通道建立请求，通过已经建立的 SSH 连接，连接至远程端口。
-// netType 为网络类型 tcp、tcp4、tcp6 以及 unix 之一。
+// netType 为网络类型 tcp、tcp4、tcp6 以及 unix 之一；
+// addr 应为远程服务端可访问的网络接口。
 // 一个经典的应用就是 Open-SSH 的 ssh -L 端口转发
 func (client *SSHClient) Dial(netType, addr string) (net.Conn, error) {
 	return client.c.Dial(netType, addr)
 }
 
-// BindConnToRemote 与 BindConnToRemoteBuffer 相同，但使用默认的 buf
-func (client *SSHClient) BindConnToRemote(lconn io.ReadWriteCloser, netType, addr string) (context.CancelFunc, error) {
-	return client.BindConnToRemoteBuffer(lconn, netType, addr, nil)
+// DialTCP 发送 direct-tcpip 通道建立请求，通过已经建立的 SSH 连接，建立TCP连接至远程端口。
+// netType 为网络类型 tcp、tcp4、tcp6 之一；
+// laddr 表示 tcp 请求来源，如果为 nil，将使用 '0.0.0.0:0'；raddr 为远程服务端可访问的地址以及端口
+func (client *SSHClient) DialTCP(netType string, laddr, raddr *net.TCPAddr) (net.Conn, error) {
+	return client.c.DialTCP(netType, laddr, raddr)
 }
 
-// BindConnToRemoteBuffer 通过已经建立的 SSH 连接，连接至远程端口，并与给定的流之间进行数据复制，复制时使用给定的 buf 作为buffer。
-// 通过返回的 CancelFunc 终止流的复制。
-// 返回 error 不为 nil 表明网络连接未成功建立
-func (client *SSHClient) BindConnToRemoteBuffer(lconn io.ReadWriteCloser, netType, addr string, buf []byte) (context.CancelFunc, error) {
-	remoteConn, err := client.c.Dial(netType, addr)
-	if err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	go CopyBufferWithContext(remoteConn, lconn, buf, ctx)
-	go CopyBufferWithContext(lconn, remoteConn, buf, ctx)
-	return cancel, nil
-}
-
-// Listen 发送 tcpip-forward 通道建立请求，通过本次建立的 SSH 信道，任何对目标地址端口的访问都将被转发至本地，
+// Listen 发送 tcpip-forward 通道建立请求，通过本次建立的 SSH 信道，任何对 SSH 服务器上目标地址端口的访问都将被转发至本地，
 // 从而监听远程系统端口。
 // netType 为网络类型 tcp、tcp4、tcp6 以及 unix 之一。
 // 一个最经典的应用就是 Open-SSH 的 ssh -R 端口转发，发送至远程目标端口的连接与数据都将被转发至返回的监听器。
@@ -131,64 +126,4 @@ type Config struct {
 	ClientVersion     string          // 必须以 'SSH-1.0-' 或者 'SSH-2.0-' 开头，如果为空，将被替换为 'SSH-2.0-GoSSH'
 	HostKeyAlgorithms []string
 	Timeout           time.Duration // 建立 tcp 连接超时时间
-}
-
-var errInvalidWrite = errors.New("invalid write result")
-
-// CopyBufferWithContext 导出的 io.copyBuffer 函数，可传入 context 来终止流之间的复制
-func CopyBufferWithContext(dst io.Writer, src io.Reader, buf []byte, ctx context.Context) (written int64, err error) {
-	// If the reader has a WriteTo method, use it to do the copy.
-	// Avoids an allocation and a copy.
-	if wt, ok := src.(io.WriterTo); ok {
-		return wt.WriteTo(dst)
-	}
-	// Similarly, if the writer has a ReadFrom method, use it to do the copy.
-	if rt, ok := dst.(io.ReaderFrom); ok {
-		return rt.ReadFrom(src)
-	}
-	if buf == nil {
-		size := 32 * 1024
-		if l, ok := src.(*io.LimitedReader); ok && int64(size) > l.N {
-			if l.N < 1 {
-				size = 1
-			} else {
-				size = int(l.N)
-			}
-		}
-		buf = make([]byte, size)
-	}
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			nr, er := src.Read(buf)
-			if nr > 0 {
-				nw, ew := dst.Write(buf[0:nr])
-				if nw < 0 || nr < nw {
-					nw = 0
-					if ew == nil {
-						ew = errInvalidWrite
-					}
-				}
-				written += int64(nw)
-				if ew != nil {
-					err = ew
-					goto ret
-				}
-				if nr != nw {
-					err = io.ErrShortWrite
-					goto ret
-				}
-			}
-			if er != nil {
-				if er != io.EOF {
-					err = er
-				}
-				goto ret
-			}
-		}
-	}
-ret:
-	return written, err
 }
