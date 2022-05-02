@@ -190,7 +190,7 @@ func main() {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	c, _ := listener.Accept()
-	client.NewDirector().BindConnTo(c, "tcp", "172.0.0.2:80", ctx, ctx)
+	client.NewDirector().BindConnTo(c, "tcp", "172.17.0.2:80", ctx, ctx)
 }
 ```
 
@@ -232,7 +232,7 @@ func main() {
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	client.NewDirector().RedirectTo(listener, network, "127.0.0.1:8080", ctx)
+	client.NewDirector().RedirectTo(listener, network, "172.17.0.2:80", ctx)
 }
 ```
 
