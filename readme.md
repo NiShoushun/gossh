@@ -194,7 +194,7 @@ func main() {
 }
 ```
 
-这里读写用了用一个 `context` 进行控制，实际上可以用两个 `context` 分别控制 `本地连接->远程服务端的连接` 以及 `远程服务端的连接->本地连接` 的数据传输。
+这里读写用了同一个 `context` 进行控制，实际上可以用两个 `context` 分别控制 `本地连接->远程服务端的连接` 以及 `远程服务端的连接->本地连接` 的数据传输。
 
 编译并运行，访问 `127.0.0.1:80` 可成功转发该 TCP 连接至 `172.17.0.2:80`：
 
@@ -240,7 +240,7 @@ func main() {
 
 ##### NewConnCallback
 
-另外 Director 也拥有一个 `NewConnCallback func(conn net.Conn) (net.Conn, error)` 类型的字段，在 `Proxy` 方法中当 `listener` 接收到一个新的连接，该函数将被调用，如果返回的 error 不为 null，将终止本次转发过程。
+另外 Director 也拥有一个 `NewConnCallback func(conn net.Conn) (net.Conn, error)` 类型的字段，在 `Proxy` 方法中当 `listener` 接收到一个新的连接，该函数将被调用，如果返回的 `error` 不为 `nil`，将终止本次转发过程。
 
 该函数目的在于对一个新的连接进行记录、检查以及对 `net.Conn` 接口实例进行转换，以支持更多功能。
 
