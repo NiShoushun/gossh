@@ -84,10 +84,10 @@ func (d *Director) bindConnsWithBuffer(lconn net.Conn, rconn net.Conn, bufSize i
 	wg.Wait()
 }
 
-// ProxyToWithBuffer 通过传入的网络监听器接受网络连接，并尝试通过 direct-tcpip 信道打开一个远程端口并开始双向地复制数据。
+// RedirectToWithBuffer 通过传入的网络监听器接受网络连接，并尝试通过 direct-tcpip 信道打开一个远程端口并开始双向地复制数据。
 // 将会阻塞，直至 Listener.Accept 返回的 err 不为 nil。
 // 通过传入 Context 来控制 Deadline、终止监听以及终止流的复制。
-func (d *Director) RedicretToWithBuffer(listener net.Listener, netType, addr string, bufSize int, ctx context.Context) {
+func (d *Director) RedirectToWithBuffer(listener net.Listener, netType, addr string, bufSize int, ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -130,12 +130,12 @@ func (d *Director) RedicretToWithBuffer(listener net.Listener, netType, addr str
 	}
 }
 
-// ProxyTo 与 ProxyToWithBuffer 作用相同，但使用默认的 buffer size
-func (d *Director) ProxyTo(localL net.Listener, netType, toAddr string, ctx context.Context) {
-	d.ProxyToWithBuffer(localL, netType, toAddr, 0, ctx)
+// RedirectTo 与 RedirectToWithBuffer 作用相同，但使用默认的 buffer size
+func (d *Director) RedirectTo(localL net.Listener, netType, toAddr string, ctx context.Context) {
+	d.RedirectToWithBuffer(localL, netType, toAddr, 0, ctx)
 }
 
-// ProxyTCPToWithBuffer 通过传入的网络监听器接受网络连接，并尝试通过 direct-tcpip 信道打开一个远程端口并开始双向地复制数据。
+// DirectTcpToWithBuffer 通过传入的网络监听器接受网络连接，并尝试通过 direct-tcpip 信道打开一个远程端口并开始双向地复制数据。
 // 将会阻塞，直至 Listener.Accept 返回的 err 不为 nil。
 // 通过传入 Context 来控制 Deadline、终止监听以及终止流的复制。
 func (d *Director) DirectTcpToWithBuffer(listener net.Listener, to *net.TCPAddr, bufSize int, ctx context.Context) {
@@ -174,9 +174,9 @@ func (d *Director) DirectTcpToWithBuffer(listener net.Listener, to *net.TCPAddr,
 	}
 }
 
-// ProxyTCPTo 与 ProxyTCPToWithBuffer 作用相同，但使用默认的 buffer size
-func (d *Director) ProxyTCPTo(localL net.Listener, netType, addr string, ctx context.Context) {
-	d.ProxyToWithBuffer(localL, netType, addr, 0, ctx)
+// RedirectTcpTo 与 RedirectTcpToWithBuffer 作用相同，但使用默认的 buffer size
+func (d *Director) RedirectTcpTo(localL net.Listener, netType, addr string, ctx context.Context) {
+	d.RedirectToWithBuffer(localL, netType, addr, 0, ctx)
 }
 
 var errInvalidWrite = errors.New("invalid write result")

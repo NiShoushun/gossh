@@ -232,7 +232,7 @@ func main() {
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	client.NewDirector().ProxyTo(listener, network, "127.0.0.1:8080", ctx)
+	client.NewDirector().RedirectTo(listener, network, "127.0.0.1:8080", ctx)
 }
 ```
 
@@ -240,7 +240,7 @@ func main() {
 
 ##### NewConnCallback
 
-另外 Director 也拥有一个 `NewConnCallback func(conn net.Conn) (net.Conn, error)` 类型的字段，在 `Proxy` 方法中当 `listener` 接收到一个新的连接，该函数将被调用，如果返回的 `error` 不为 `nil`，将终止本次转发过程。
+另外 Director 也拥有一个 `NewConnCallback func(conn net.Conn) (net.Conn, error)` 类型的字段，在 `RedirectTo` 方法中当 `listener` 接收到一个新的连接，该函数将被调用，如果返回的 `error` 不为 `nil`，将终止本次转发过程。
 
 该函数目的在于对一个新的连接进行记录、检查以及对 `net.Conn` 接口实例进行转换，以支持更多功能。
 
