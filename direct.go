@@ -87,7 +87,7 @@ func (d *Director) bindConnsWithBuffer(lconn net.Conn, rconn net.Conn, bufSize i
 // ProxyToWithBuffer 通过传入的网络监听器接受网络连接，并尝试通过 direct-tcpip 信道打开一个远程端口并开始双向地复制数据。
 // 将会阻塞，直至 Listener.Accept 返回的 err 不为 nil。
 // 通过传入 Context 来控制 Deadline、终止监听以及终止流的复制。
-func (d *Director) ProxyToWithBuffer(listener net.Listener, netType, addr string, bufSize int, ctx context.Context) {
+func (d *Director) RedicretToWithBuffer(listener net.Listener, netType, addr string, bufSize int, ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -138,7 +138,7 @@ func (d *Director) ProxyTo(localL net.Listener, netType, toAddr string, ctx cont
 // ProxyTCPToWithBuffer 通过传入的网络监听器接受网络连接，并尝试通过 direct-tcpip 信道打开一个远程端口并开始双向地复制数据。
 // 将会阻塞，直至 Listener.Accept 返回的 err 不为 nil。
 // 通过传入 Context 来控制 Deadline、终止监听以及终止流的复制。
-func (d *Director) ProxyTCPToWithBuffer(listener net.Listener, to *net.TCPAddr, bufSize int, ctx context.Context) {
+func (d *Director) DirectTcpToWithBuffer(listener net.Listener, to *net.TCPAddr, bufSize int, ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
