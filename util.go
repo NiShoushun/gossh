@@ -18,7 +18,7 @@ func PrivateKeyPath(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return path.Join(user.HomeDir, DefaultPrivateKeyPath), nil
+	return path.Join(user.HomeDir, OpenSSHPrivateKeyPathPath), nil
 }
 
 // KnownHostsPath 获取给定用户的默认的 Open-SSH known_hosts 路径
@@ -27,7 +27,7 @@ func KnownHostsPath(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return path.Join(user.HomeDir, DefaultKnownHosts), nil
+	return path.Join(user.HomeDir, OpenSSHKnownHostsPath), nil
 }
 
 // DefaultConfigAuthByPasswd 生成默认的配置，认证方式为密码认证。

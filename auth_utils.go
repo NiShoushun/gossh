@@ -22,11 +22,12 @@ type KnownHostsChecker struct {
 }
 
 const (
-	DefaultPrivateKeyPath = ".ssh/id_rsa"
-	DefaultKnownHosts     = ".ssh/known_hosts"
+	OpenSSHPrivateKeyPathPath = ".ssh/id_rsa"
+	OpenSSHKnownHostsPath     = ".ssh/known_hosts"
 )
 
 // AuthByPrivateKeysFromPaths 从给定的文件中加载私钥并生成 Signer，并生成 ssh.AuthMethod 认证方法.
+// 任何一个文件解析失败都将返回一个不为 nil 的错误
 func AuthByPrivateKeysFromPaths(files ...string) (ssh.AuthMethod, error) {
 	var signers []ssh.Signer
 	for _, file := range files {

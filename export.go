@@ -9,6 +9,11 @@ type BannerCallback func(message string) error
 
 type HostKeyCallback func(hostname string, remote net.Addr, key PublicKey) error
 
+// RetryableAuthMethod 是其他 auth 方法的装饰器，使它们能够在考虑 AuthMethod 本身失败之前重试到 maxTries。如果 maxTries <= 0，将无限期重试
+func RetryableAuthMethod(auth AuthMethod, maxTries int) AuthMethod {
+	return ssh.RetryableAuthMethod(auth, maxTries)
+}
+
 // WrapBannerCallback WrapHostKeyCallback 将 BannerCallback 转化为 ssh 包可接受参数类型
 func WrapBannerCallback(callback BannerCallback) func(message string) error {
 	if callback == nil {

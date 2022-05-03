@@ -3,8 +3,6 @@ module github.com/nishoushun/gossh
 go 1.16
 
 require (
-
-	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
-	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
-
+	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
+	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171
 )
