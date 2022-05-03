@@ -3,6 +3,7 @@
 本包对 `golang.org/x/crypto/ssh` 中的客户端相关类型进行了简单的包装，一般的使用者能够通过较少的代码量快速实现一个可正常使用的 SSH 客户端应用程序。
 
 目前只提供了部分功能，后续会补上一些常用的 subsystem 的工具实现，例如 `sftp` 等。
+更多用法请看 [https://pkg.go.dev/github.com/nishoushun/gossh](https://pkg.go.dev/github.com/nishoushun/gossh#section-readme)
 
 ### 安装
 
