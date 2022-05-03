@@ -54,6 +54,11 @@ func Connect(addr string, config *Config) (*SSHClient, error) {
 	}, err
 }
 
+// Client 获取原始的 ssh.Client
+func (client *SSHClient) Client() *ssh.Client {
+	return client.c
+}
+
 // OpenSession 打开一个新的 session 通道
 func (client *SSHClient) OpenSession() (*Session, error) {
 	sess, err := client.c.NewSession()

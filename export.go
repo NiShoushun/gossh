@@ -34,6 +34,17 @@ func WrapHostKeyCallback(callback HostKeyCallback) func(hostname string, remote 
 	}
 }
 
+// KeyboardInteractiveChallenge 应该打印服务端问题，可选择禁用回显（例如密码），并返回所有答案。
+// KeyboardInteractiveChallenge 可以在单个会话中被多次调用。
+// 认证成功后，服务器可以发送一个不带问题的挑战，应打印名称和指令消息。
+// RFC 4256 第 3.3 节详细说明了 UI 在 CLI 和 GUI 环境中的行为方式。
+type KeyboardInteractiveChallenge func(name, instruction string, questions []string, echos []bool) (answers []string, err error)
+
+// KeyboardInteractive 返回一个 AuthMethod
+func KeyboardInteractive(challenge KeyboardInteractiveChallenge) AuthMethod {
+	return ssh.KeyboardInteractive(ssh.KeyboardInteractiveChallenge(challenge))
+}
+
 type NewChannel interface {
 	ssh.NewChannel
 }
