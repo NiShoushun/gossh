@@ -314,10 +314,6 @@ Commands:
 
 ![Peek 2022-03-27 03-32](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202205012037363.gif)
 
-##### 添加新主机至 `known_hosts`
-
-![Peek 2022-03-27 03-35](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202205012037246.gif)
-
 ##### 命令执行
 
 ![Peek 2022-03-27 03-37](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202205012037354.gif)
